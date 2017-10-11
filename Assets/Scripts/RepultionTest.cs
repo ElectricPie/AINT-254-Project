@@ -48,15 +48,17 @@ public class RepultionTest : MonoBehaviour {
     {
         Vector3 temp = new Vector3(m_direcToObj.x * strength, m_direcToObj.y * strength, m_direcToObj.z * strength); //Creates a vector in the direction of the well
 
-        testObj.GetComponent<Rigidbody>().velocity = temp; //Applys the vector to the object
-        //testObj.GetComponent<ObjectMovement>().UpdateVelocity(temp);
+        //testObj.GetComponent<Rigidbody>().velocity = temp; //Applys the vector to the object
+        //Debug.Log("Velocity: " + temp);
+        testObj.GetComponent<ObjectMovement>().CheckEffect(gameObject, temp);
     }
 
     void Attract()
     {
         Vector3 temp = new Vector3(-m_direcToObj.x * strength, -m_direcToObj.y * strength, -m_direcToObj.z * strength);
 
-        testObj.GetComponent<Rigidbody>().velocity = temp;
-        //testObj.GetComponent<ObjectMovement>().UpdateVelocity(temp);
+        //testObj.GetComponent<Rigidbody>().velocity = temp;
+        //Debug.Log("Velocity: " + temp);
+        testObj.GetComponent<ObjectMovement>().CheckEffect(gameObject, temp);
     }
 }
