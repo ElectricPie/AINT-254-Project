@@ -28,27 +28,11 @@ public class ObjectMovement : MonoBehaviour {
         GetComponent<Rigidbody>().velocity = temp;
     }
 
-    public void CheckEffect(GameObject gameObj, Vector3 vec)
+    public void UpdateWells(GameObject obj, Vector3 vec)
     {
-        
-        //Debug.Log("Checking");
+        int location = CheckWells(obj);
 
-        bool found = false;
-        int location = 0;
-
-        for (int i = 0; i < m_effectsOrig.Count; i++)
-        {
-            if (m_effectsOrig[i] == gameObj)
-            {
-                //Debug.Log("Found");
-                found = true;
-                location = i;
-            }
-        }
-        //Debug.Log("Found: " + found);
-
-        
-        if (found == true)
+        if (location != 0)
         {
             m_velocityEffects[location] = vec;
             //Debug.Log("Added vec" + m_velocityEffects[location]);
@@ -56,11 +40,34 @@ public class ObjectMovement : MonoBehaviour {
         else
         {
             //Debug.Log("Creating");
-            m_effectsOrig.Add(gameObj);
+            m_effectsOrig.Add(obj);
             //Debug.Log("Obj: " + m_effectsOrig[1]);
             m_velocityEffects.Add(new Vector3());
             //Debug.Log("Obj: " + m_velocityEffects[1]);
         }
+    }
 
+    public void RemoveWell(GameObject obj)
+    {
+        int location = CheckWells(obj);
+
+        m_effectsOrig.RemoveAt(location);
+        m_velocityEffects.RemoveAt(location);
+    }
+
+    private int CheckWells(GameObject obj)
+    {
+        int location = 0;
+ 
+        for (int i = 0; i < m_effectsOrig.Count; i++)
+        {
+            if (m_effectsOrig[i] == obj)
+            {
+                //Debug.Log("Found");
+                location = i;
+            }
+        }
+
+        return location;
     }
 }

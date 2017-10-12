@@ -25,15 +25,6 @@ public class RepultionTest : MonoBehaviour {
         m_direcToObj = testObj.transform.position - transform.position;
 
         UpdateUI();
-
-        if (repel == true)
-        {
-            Repel();
-        }
-        else
-        {
-            Attract();
-        }
     }
 
     void UpdateUI()
@@ -50,7 +41,7 @@ public class RepultionTest : MonoBehaviour {
 
         //testObj.GetComponent<Rigidbody>().velocity = temp; //Applys the vector to the object
         //Debug.Log("Velocity: " + temp);
-        testObj.GetComponent<ObjectMovement>().CheckEffect(gameObject, temp);
+        testObj.GetComponent<ObjectMovement>().UpdateWells(gameObject, temp);
     }
 
     void Attract()
@@ -59,6 +50,30 @@ public class RepultionTest : MonoBehaviour {
 
         //testObj.GetComponent<Rigidbody>().velocity = temp;
         //Debug.Log("Velocity: " + temp);
-        testObj.GetComponent<ObjectMovement>().CheckEffect(gameObject, temp);
+        testObj.GetComponent<ObjectMovement>().UpdateWells(gameObject, temp);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("Entered");
+    }
+
+    private void OnTriggerStay()
+    {
+        Debug.Log("Collied: " + name);
+        if (repel == true)
+        {
+            Repel();
+        }
+        else
+        {
+            Attract();
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        //Debug.Log("Hit: " + other);
+        testObj.GetComponent<ObjectMovement>().RemoveWell(gameObject);
     }
 }
