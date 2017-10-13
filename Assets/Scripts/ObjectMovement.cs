@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class ObjectMovement : MonoBehaviour {
     List<GameObject> m_effectsOrig = new List<GameObject>();
     List<Vector3> m_velocityEffects = new List<Vector3>();

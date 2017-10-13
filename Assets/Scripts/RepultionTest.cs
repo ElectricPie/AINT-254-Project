@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class RepultionTest : MonoBehaviour {
-    [Range (0,2)]
+    [Range (0,1)]
     public float strength;
 
     public GameObject testObj;
@@ -14,10 +14,12 @@ public class RepultionTest : MonoBehaviour {
 
     private Vector3 m_direcToObj;
 
+    private float m_radius;
+
 	// Use this for initialization
 	void Start () {
-		
-	}
+        m_radius = GetComponent<SphereCollider>().radius * 0.8f;
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -25,6 +27,8 @@ public class RepultionTest : MonoBehaviour {
         m_direcToObj = testObj.transform.position - transform.position;
 
         UpdateUI();
+
+        
     }
 
     void UpdateUI()
@@ -37,7 +41,7 @@ public class RepultionTest : MonoBehaviour {
 
     void Repel()
     {
-        Vector3 temp = new Vector3(m_direcToObj.x * strength, m_direcToObj.y * strength, m_direcToObj.z * strength); //Creates a vector in the direction of the well
+        Vector3 temp = new Vector3(m_direcToObj.x, m_direcToObj.y, m_direcToObj.z) * strength; //Creates a vector in the direction of the well
 
         //testObj.GetComponent<Rigidbody>().velocity = temp; //Applys the vector to the object
         //Debug.Log("Velocity: " + temp);
@@ -46,7 +50,7 @@ public class RepultionTest : MonoBehaviour {
 
     void Attract()
     {
-        Vector3 temp = new Vector3(-m_direcToObj.x * strength, -m_direcToObj.y * strength, -m_direcToObj.z * strength);
+        Vector3 temp = new Vector3(-m_direcToObj.x, -m_direcToObj.y, -m_direcToObj.z) * strength;
 
         //testObj.GetComponent<Rigidbody>().velocity = temp;
         //Debug.Log("Velocity: " + temp);
@@ -69,11 +73,18 @@ public class RepultionTest : MonoBehaviour {
         {
             Attract();
         }
+
+        GetDistance();
     }
 
     private void OnTriggerExit(Collider other)
     {
         //Debug.Log("Hit: " + other);
         testObj.GetComponent<ObjectMovement>().RemoveWell(gameObject);
+    }
+
+    private void GetDistance()
+    {
+        float 
     }
 }
