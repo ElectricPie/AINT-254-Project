@@ -25,12 +25,12 @@ public class ObjectMovement : MonoBehaviour {
         }
 
         //Debug.Log("Temp: " + temp);
-
-        GetComponent<Rigidbody>().velocity = temp;
+        GetComponent<Rigidbody>().velocity += temp;
     }
 
     public void UpdateWells(GameObject obj, Vector3 vec)
     {
+        Debug.Log("Debug: " + gameObject);
         int location = CheckWells(obj);
 
         if (location != 0)

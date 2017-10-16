@@ -7,64 +7,66 @@ public class RepultionTest : MonoBehaviour {
     [Range (0,1)]
     public float strength;
 
-    public GameObject testObj;
+    //public GameObject testObj;
     public GameObject UI;
 
     public bool repel;
 
-    private Vector3 m_direcToObj;
+    private List<Vector3> m_direcToObj = new List<Vector3>();
 
     private float m_radius;
+
+    private List<GameObject> m_objects = new List<GameObject>();
 
 	// Use this for initialization
 	void Start () {
         m_radius = GetComponent<SphereCollider>().radius * 0.8f;
+        //m_objects.Add(null);
     }
 	
 	// Update is called once per frame
 	void Update () {
-        //Get the direction of the other object
-        m_direcToObj = testObj.transform.position - transform.position;
-
-        UpdateUI();
-
-        
-    }
-
-    void UpdateUI()
-    {
-        //Updates the UI to show the direction
-        UI.transform.GetChild(0).GetComponent<Text>().text = m_direcToObj.x.ToString();
-        UI.transform.GetChild(1).GetComponent<Text>().text = m_direcToObj.y.ToString();
-        UI.transform.GetChild(2).GetComponent<Text>().text = m_direcToObj.z.ToString();
+        for (int i = 0; i < m_direcToObj.Count; i++)
+        {
+            m_direcToObj[i] = m_objects[i].transform.position - transform.position;
+        }
     }
 
     void Repel()
     {
-        Vector3 temp = new Vector3(m_direcToObj.x, m_direcToObj.y, m_direcToObj.z) * strength; //Creates a vector in the direction of the well
-
         //testObj.GetComponent<Rigidbody>().velocity = temp; //Applys the vector to the object
         //Debug.Log("Velocity: " + temp);
-        testObj.GetComponent<ObjectMovement>().UpdateWells(gameObject, temp);
+        for (int i = 0; i < m_objects.Count; i++)
+        {
+            Vector3 temp = new Vector3(m_direcToObj[i].x, m_direcToObj[i].y, m_direcToObj[i].z) * strength; //Creates a vector in the direction of the well
+
+            m_objects[i].GetComponent<ObjectMovement>().UpdateWells(gameObject, temp);
+        }
     }
 
     void Attract()
     {
-        Vector3 temp = new Vector3(-m_direcToObj.x, -m_direcToObj.y, -m_direcToObj.z) * strength;
-
         //testObj.GetComponent<Rigidbody>().velocity = temp;
         //Debug.Log("Velocity: " + temp);
-        testObj.GetComponent<ObjectMovement>().UpdateWells(gameObject, temp);
+        for (int i = 0; i < m_objects.Count; i++)
+        {
+            Vector3 temp = new Vector3(-m_direcToObj[i].x, -m_direcToObj[i].y, -m_direcToObj[i].z) * strength;
+
+            Debug.Log("Obj: " + m_objects[i]);
+            m_objects[i].GetComponent<ObjectMovement>().UpdateWells(gameObject, temp);
+        }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Entered");
+        //Debug.Log("Other: " + other.name);
+        m_objects.Add(other.gameObject);
+        m_direcToObj.Add(new Vector3());
     }
 
-    private void OnTriggerStay()
+    private void OnTriggerStay(Collider other)
     {
-        Debug.Log("Collied: " + name);
+        //Debug.Log("Collied: " + other.name);
         if (repel == true)
         {
             Repel();
@@ -73,18 +75,28 @@ public class RepultionTest : MonoBehaviour {
         {
             Attract();
         }
-
-        GetDistance();
     }
 
     private void OnTriggerExit(Collider other)
     {
         //Debug.Log("Hit: " + other);
-        testObj.GetComponent<ObjectMovement>().RemoveWell(gameObject);
+        m_objects[CheckObjList(other.gameObject)].GetComponent<ObjectMovement>().RemoveWell(gameObject);
+        m_direcToObj.RemoveAt(CheckObjList(other.gameObject));
+        m_objects.RemoveAt(CheckObjList(other.gameObject));
     }
 
-    private void GetDistance()
+    private int CheckObjList(GameObject obj)
     {
-        float 
+        int location = -1;
+
+        for (int i = 0; i < m_objects.Count; i++)
+        {
+            if (m_objects[i] == obj)
+            {
+                location = i;
+            }
+        }
+
+        return location;
     }
 }
