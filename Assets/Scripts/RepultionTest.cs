@@ -4,14 +4,15 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class RepultionTest : MonoBehaviour {
-    [Range (0,1)]
-    public float strength;
+    
 
-    //public GameObject testObj;
-    public GameObject UI;
-
+    //public
     public bool repel;
 
+    [Range(0, 1)]
+    public float strength;
+
+    //Private
     private List<Vector3> m_direcToObj = new List<Vector3>();
 
     private float m_radius;
@@ -25,7 +26,7 @@ public class RepultionTest : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
         for (int i = 0; i < m_direcToObj.Count; i++)
         {
             m_direcToObj[i] = m_objects[i].transform.position - transform.position;
@@ -52,7 +53,7 @@ public class RepultionTest : MonoBehaviour {
         {
             Vector3 temp = new Vector3(-m_direcToObj[i].x, -m_direcToObj[i].y, -m_direcToObj[i].z) * strength;
 
-            Debug.Log("Obj: " + m_objects[i]);
+            //Debug.Log("Obj: " + m_objects[i]);
             m_objects[i].GetComponent<ObjectMovement>().UpdateWells(gameObject, temp);
         }
     }

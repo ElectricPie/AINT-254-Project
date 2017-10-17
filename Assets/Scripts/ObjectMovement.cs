@@ -30,7 +30,7 @@ public class ObjectMovement : MonoBehaviour {
 
     public void UpdateWells(GameObject obj, Vector3 vec)
     {
-        Debug.Log("Debug: " + gameObject);
+        //Debug.Log("Debug: " + gameObject);
         int location = CheckWells(obj);
 
         if (location != 0)
