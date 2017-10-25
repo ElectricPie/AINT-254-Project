@@ -4,8 +4,11 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class ObjectMovement : MonoBehaviour {
-    List<GameObject> m_effectsOrig = new List<GameObject>();
-    List<Vector3> m_velocityEffects = new List<Vector3>();
+    [SerializeField]
+    public bool interactable = false;
+
+    private List<GameObject> m_effectsOrig = new List<GameObject>();
+    private List<Vector3> m_velocityEffects = new List<Vector3>();
 
     // Use this for initialization
     void Start () {
@@ -70,5 +73,22 @@ public class ObjectMovement : MonoBehaviour {
         }
 
         return location;
+    }
+
+    public void PickUp()
+    {
+        //GetComponent<Rigidbody>().isKinematic = true;
+    }
+
+    public void Drop()
+    {
+        //GetComponent<Rigidbody>().isKinematic = false;
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+    }
+
+    public void AjustPos(Transform pos)
+    {
+        //gameObject.transform.position = pos.transform.position + pos.forward * 3;
+        gameObject.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 3;
     }
 }

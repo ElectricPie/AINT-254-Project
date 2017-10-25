@@ -12,6 +12,9 @@ public class RepultionTest : MonoBehaviour {
     [Range(0, 1)]
     public float strength;
 
+    public Material repelMat;
+    public Material attractMat;
+
     //Private
     private List<Vector3> m_direcToObj = new List<Vector3>();
 
@@ -30,6 +33,15 @@ public class RepultionTest : MonoBehaviour {
         for (int i = 0; i < m_direcToObj.Count; i++)
         {
             m_direcToObj[i] = m_objects[i].transform.position - transform.position;
+        }
+
+        if (repel)
+        {
+            GetComponent<Renderer>().material.color = Color.blue;
+        }
+        else
+        {
+            GetComponent<Renderer>().material.color = Color.red;
         }
     }
 
