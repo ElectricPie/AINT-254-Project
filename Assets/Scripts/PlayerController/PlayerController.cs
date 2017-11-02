@@ -1,16 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
+    public GameObject pressIcon;
+    public GameObject pickUpIcon;
 
     [SerializeField]
-    private float m_speed = 0.8f;
+    private float m_speed = 5.0f;
 
     [SerializeField]
-    private float m_jump = 5;
-
-    private float m_interactDelay;
+    private float m_jump = 1.0f;
 
     private Rigidbody m_rigidbody;
 
@@ -23,38 +24,48 @@ public class PlayerController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
+        pressIcon.SetActive(false);
+        pickUpIcon.SetActive(false);
+
         m_rigidbody = GetComponent<Rigidbody>();
 	}
 
     // Update is called once per frame
     void Update() {
-        float xInput = Input.GetAxis("Horizontal");
-        float zInput = Input.GetAxis("Vertical");
+        float xInput = Input.GetAxis("Horizontal") * Time.deltaTime * m_speed;
+        float zInput = Input.GetAxis("Vertical") * Time.deltaTime * m_speed;
         float xMouseInput = Input.GetAxis("Mouse X");
 
-        temp = (transform.right * xInput + transform.forward * zInput) * m_speed;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
 
-        if (temp.x > 0.2)
-            temp.x = 0.2f;
+        Transform cam = Camera.main.transform;
+        Ray ray = new Ray(cam.position, cam.forward);
+        RaycastHit hit;
 
-        if (temp.x < -0.2)
-            temp.x = -0.2f;
-
-        if (temp.z > 0.2)
-            temp.z = 0.2f;
-
-        if (temp.z < -0.2)
-            temp.z = -0.2f;
-
-        //Jumping
-        if (Input.GetAxis("Jump") == 1 && m_grounded == true)
+        //-Icons
+        if (Physics.Raycast(ray, out hit))
         {
-            temp.y += m_jump;
-            m_grounded = false;
+            if (hit.collider.tag == "Object")
+            {
+                pickUpIcon.SetActive(true);
+            }
+            else if (hit.collider.tag == "PlyBtn")
+            {
+                pressIcon.SetActive(true);
+            }
+            else
+            {
+                pressIcon.SetActive(false);
+                pickUpIcon.SetActive(false);
+            }
         }
 
         //Interacting
-        if (Input.GetAxis("Interact") == 1 && m_interactDelay <= 0)
+        if (Input.GetButtonDown("Interact"))// && m_interactDelay <= 0)
         {
             if (m_holdingObj)
             {
@@ -62,48 +73,51 @@ public class PlayerController : MonoBehaviour {
 
                 m_heldObj.Drop();
                 m_heldObj = null;
-
-                m_interactDelay = 1;            }
+            }
             else
             {
-                Transform cam = Camera.main.transform;
-                Ray ray = new Ray(cam.position, cam.forward);
-                RaycastHit hit;
-
                 if (Physics.Raycast(ray, out hit))
                 {
-                    print(hit.collider);
-
-                    try
+                    //Debug.Log(hit.collider);
+                    if (hit.transform.tag == "Object")
                     {
-                        m_heldObj = hit.collider.gameObject.GetComponent<ObjectMovement>();
-                        m_heldObj.PickUp();
-                        m_holdingObj = true;
+                        try
+                        {
+                            m_heldObj = hit.collider.gameObject.GetComponent<ObjectMovement>();
+                            m_heldObj.PickUp();
+                            m_holdingObj = true;
+                        }
+                        catch
+                        {
+                            m_holdingObj = false;
+                        }
                     }
-                    catch
+                    else if (hit.transform.tag == "PlyBtn")
                     {
-                        m_holdingObj = false;
+                        hit.transform.gameObject.GetComponent<PlyButton>().TriggerBtn();
                     }
                 }
 
-                m_interactDelay = 1;
+
             }
         }
 
-
-        m_rigidbody.velocity += temp;
-
         if (m_holdingObj)
         {
-            Debug.Log("Moveing Obj");
             m_heldObj.AjustPos(gameObject.transform);
         }
 
-        if (m_interactDelay > 0)
+        //Jumping
+        if (Input.GetAxis("Jump") == 1 && m_grounded == true)
         {
-            m_interactDelay -= Time.deltaTime * 1;
+            Vector3 temp = new Vector3();
+            temp.y += m_jump;
+            m_grounded = false;
+
+            m_rigidbody.velocity += temp;
         }
 
+        transform.Translate(xInput, 0, zInput);
         transform.Rotate(0, xMouseInput, 0);
     }
 

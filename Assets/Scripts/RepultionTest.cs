@@ -7,13 +7,10 @@ public class RepultionTest : MonoBehaviour {
     
 
     //public
-    public bool repel;
+    private bool m_polarity;
 
-    [Range(0, 1)]
-    public float strength;
-
-    public Material repelMat;
-    public Material attractMat;
+    [Range(0, 1), SerializeField]
+    private float m_strength;
 
     //Private
     private List<Vector3> m_direcToObj = new List<Vector3>();
@@ -35,7 +32,7 @@ public class RepultionTest : MonoBehaviour {
             m_direcToObj[i] = m_objects[i].transform.position - transform.position;
         }
 
-        if (repel)
+        if (m_polarity)
         {
             GetComponent<Renderer>().material.color = Color.blue;
         }
@@ -51,7 +48,7 @@ public class RepultionTest : MonoBehaviour {
         //Debug.Log("Velocity: " + temp);
         for (int i = 0; i < m_objects.Count; i++)
         {
-            Vector3 temp = new Vector3(m_direcToObj[i].x, m_direcToObj[i].y, m_direcToObj[i].z) * strength; //Creates a vector in the direction of the well
+            Vector3 temp = new Vector3(m_direcToObj[i].x, m_direcToObj[i].y, m_direcToObj[i].z) * m_strength; //Creates a vector in the direction of the well
 
             m_objects[i].GetComponent<ObjectMovement>().UpdateWells(gameObject, temp);
         }
@@ -63,7 +60,7 @@ public class RepultionTest : MonoBehaviour {
         //Debug.Log("Velocity: " + temp);
         for (int i = 0; i < m_objects.Count; i++)
         {
-            Vector3 temp = new Vector3(-m_direcToObj[i].x, -m_direcToObj[i].y, -m_direcToObj[i].z) * strength;
+            Vector3 temp = new Vector3(-m_direcToObj[i].x, -m_direcToObj[i].y, -m_direcToObj[i].z) * m_strength;
 
             //Debug.Log("Obj: " + m_objects[i]);
             m_objects[i].GetComponent<ObjectMovement>().UpdateWells(gameObject, temp);
@@ -80,7 +77,7 @@ public class RepultionTest : MonoBehaviour {
     private void OnTriggerStay(Collider other)
     {
         //Debug.Log("Collied: " + other.name);
-        if (repel == true)
+        if (m_polarity == true)
         {
             Repel();
         }
@@ -111,5 +108,17 @@ public class RepultionTest : MonoBehaviour {
         }
 
         return location;
+    }
+
+
+
+    public void Polarity(bool polarity)
+    {
+        m_polarity = polarity;
+    }
+
+    public void Strength(float strength)
+    {
+        m_strength = strength;
     }
 }
