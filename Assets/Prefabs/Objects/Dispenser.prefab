@@ -41,9 +41,25 @@ GameObject:
   - component: {fileID: 136236915838791030}
   - component: {fileID: 23576561548703440}
   - component: {fileID: 114428893101757610}
+  - component: {fileID: 65617947275452408}
   m_Layer: 0
   m_Name: Tube
   m_TagString: Dispenser
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1749405270443162
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4976000851848482}
+  m_Layer: 0
+  m_Name: CubeSpawn
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -67,14 +83,28 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1384530891905606}
-  m_LocalRotation: {x: -0.27050945, y: 0.65331817, z: 0.2705094, w: 0.6533182}
-  m_LocalPosition: {x: -25.141926, y: 6.64, z: 30.95}
+  m_LocalRotation: {x: 0, y: 0.8808908, z: 0.47331968, w: 0}
+  m_LocalPosition: {x: -70.36, y: 7.45, z: 53.84}
   m_LocalScale: {x: 3.2354496, y: 3.2354467, z: 3.2354467}
   m_Children:
   - {fileID: 4595756713217378}
+  - {fileID: 4976000851848482}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -44.984, y: 90.00001, z: 0}
+  m_LocalEulerAnglesHint: {x: -56.5, y: 180, z: 0}
+--- !u!4 &4976000851848482
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1749405270443162}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.758, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4694664422267384}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &23001994268301274
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -153,6 +183,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1588240214169712}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!65 &65617947275452408
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1588240214169712}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.0000004, y: 2.0000007, z: 0.115862064}
+  m_Center: {x: 0, y: 0.00000004569376, z: -0.57189626}
 --- !u!114 &114428893101757610
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -166,6 +208,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dispensePrefab: {fileID: 1495158140444972, guid: e6ba6ff2e8449074d8ec1e229e019186,
     type: 2}
+  cubeSpwan: {fileID: 0}
 --- !u!136 &136236915838791030
 CapsuleCollider:
   m_ObjectHideFlags: 1

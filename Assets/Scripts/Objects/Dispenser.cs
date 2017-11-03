@@ -4,13 +4,15 @@ using UnityEngine;
 
 public class Dispenser : MonoBehaviour {
     public GameObject dispensePrefab;
+    public GameObject cubeSpwan;
 
     private GameObject m_dispensedItem;
 
     private void Start()
     {
         m_dispensedItem = Instantiate(dispensePrefab);
-        m_dispensedItem.transform.position = new Vector3(-23.4f, 4.65f, 30.8f);
+        //m_dispensedItem.transform.localPosition = new Vector3(0f, -0.795f, 0f);
+        m_dispensedItem.transform.localPosition = gameObject.transform.position;
     }
 
     public void Activate()
@@ -22,7 +24,8 @@ public class Dispenser : MonoBehaviour {
 
     public void Dispense()
     {
-        m_dispensedItem.transform.position = new Vector3(-23.4f, 4.65f, 30.8f);
+        //m_dispensedItem.transform.localPosition = new Vector3(0f, -0.795f, 0f);
+        m_dispensedItem.transform.localPosition = gameObject.transform.position;
 
         m_dispensedItem.SetActive(true);
     }
