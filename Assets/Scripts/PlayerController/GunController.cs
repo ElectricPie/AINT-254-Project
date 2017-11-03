@@ -15,9 +15,11 @@ public class GunController : MonoBehaviour {
     public Transform gravityWellHolder;
 
     private bool m_polarity;
-    private float m_strength;
-    private int m_power;
+    private bool m_cleared;
 
+    private float m_strength;
+
+    private int m_power;
     private int m_wellCycle;
 
     //private List<GameObject> m_gravityWells;
@@ -26,6 +28,7 @@ public class GunController : MonoBehaviour {
     void Start () {
         m_gravityWells = new GameObject[wellAmount];
         gravityWellPreview = Instantiate(gravityWellPreview);
+        m_cleared = true;
 
         for (int i = 0; i < m_gravityWells.Length; i++)
         {
@@ -62,7 +65,7 @@ public class GunController : MonoBehaviour {
         //-Power
         if (Input.GetButtonDown("Increase"))
         {
-            if (m_strength < 0.5) {
+            if (m_strength < 0.9) {
                 m_strength += 0.1f;
                 m_power += 1;
             }
@@ -138,21 +141,26 @@ public class GunController : MonoBehaviour {
                     {
                         m_wellCycle = 0;
                     }
+
+                    m_cleared = false;
                 }
             }
             
         }
 
         //-Clear
-        if (Input.GetButtonDown("Clear")) {
+        if (Input.GetButtonDown("Clear") && !m_cleared) {
             if (m_wellCycle > 1)
             {
                 m_wellCycle--;
             }
             else
             {
-                m_wellCycle = wellAmount;
+                m_wellCycle = wellAmount - 1;
             }
+
+            m_gravityWells[m_wellCycle].SetActive(false);
+            m_cleared = true;
         }
     }
 

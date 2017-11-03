@@ -17,6 +17,7 @@ public class Dispenser : MonoBehaviour {
 
     public void Activate()
     {
+        m_dispensedItem.GetComponent<Rigidbody>().velocity = new Vector3(0,0,0);
         m_dispensedItem.SetActive(false);
 
         Invoke("Dispense", 1);

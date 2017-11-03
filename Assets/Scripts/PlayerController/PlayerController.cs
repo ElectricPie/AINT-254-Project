@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour {
 
     private bool m_grounded;
     private bool m_holdingObj = false;
+    private bool m_stance = false;
 
     private ObjectMovement m_heldObj;
 
@@ -105,10 +106,11 @@ public class PlayerController : MonoBehaviour {
         if (m_holdingObj)
         {
             m_heldObj.AjustPos(gameObject.transform);
+            pickUpIcon.SetActive(false);
         }
 
         //Jumping
-        if (Input.GetAxis("Jump") == 1 && m_grounded == true)
+        if (Input.GetButtonDown("Jump") && m_grounded == true)
         {
             Vector3 temp = new Vector3();
             temp.y += m_jump;
@@ -119,11 +121,38 @@ public class PlayerController : MonoBehaviour {
 
         transform.Translate(xInput, 0, zInput);
         transform.Rotate(0, xMouseInput, 0);
+
+        //Change Stance
+        if (Input.GetButtonDown("Stance"))
+        {
+            if (m_stance)
+            {
+                tag = "Player";
+
+                m_stance = !m_stance;
+            }
+            else
+            {
+                tag = "Untagged";
+
+                m_stance = !m_stance;
+            }
+        }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnCollisionStay(Collision collision)
     {
-        m_grounded = true;
+        if (collision.gameObject.tag == "Ground")
+        {
+            m_grounded = true;
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        
+        m_grounded = false;
+        
     }
 }
 

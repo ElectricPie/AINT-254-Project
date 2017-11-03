@@ -69,34 +69,59 @@ public class RepultionTest : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other)
     {
-        //Debug.Log("Other: " + other.name);
-        m_objects.Add(other.gameObject);
-        m_direcToObj.Add(new Vector3());
+        
+        if (other.tag == "Object" || other.tag == "Player")
+        {
+            //Debug.Log("Other: " + other.name);
+
+            if (CheckObjList(other.gameObject) >= 0)
+            {
+                Debug.Log("Object already affected");
+            }
+            else
+            {
+                m_objects.Add(other.gameObject);
+                m_direcToObj.Add(new Vector3());
+            }
+        }
+        
     }
 
     private void OnTriggerStay(Collider other)
     {
-        //Debug.Log("Collied: " + other.name);
-        if (m_polarity == true)
+        if ((other.tag == "Object" || other.tag == "Player"))
         {
-            Repel();
-        }
-        else
-        {
-            Attract();
+            Debug.Log("Collied: " + other.name);
+            if (m_polarity == true)
+            {
+                Repel();
+            }
+            else
+            {
+                Attract();
+            }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        //Debug.Log("Hit: " + other);
-        m_objects[CheckObjList(other.gameObject)].GetComponent<ObjectMovement>().RemoveWell(gameObject);
-        m_direcToObj.RemoveAt(CheckObjList(other.gameObject));
-        m_objects.RemoveAt(CheckObjList(other.gameObject));
+        if (other.tag == "Object" || other.tag == "Player")
+        {
+            //Debug.Log("Hit: " + other);
+            m_objects[CheckObjList(other.gameObject)].GetComponent<ObjectMovement>().RemoveWell(gameObject);
+
+            int index = CheckObjList(other.gameObject);
+            Debug.Log("Index: " + index);
+
+            m_direcToObj.RemoveAt(CheckObjList(other.gameObject));
+            m_objects.RemoveAt(CheckObjList(other.gameObject));
+        }
     }
 
     private int CheckObjList(GameObject obj)
     {
+        //Debug.Log("Gameobject: " + obj);
+
         int location = -1;
 
         for (int i = 0; i < m_objects.Count; i++)
@@ -110,7 +135,12 @@ public class RepultionTest : MonoBehaviour {
         return location;
     }
 
-
+    private void OnDisable()
+    {
+        Debug.Log("Disable");
+        m_objects.Clear();
+        m_direcToObj.Clear();
+    }
 
     public void Polarity(bool polarity)
     {
