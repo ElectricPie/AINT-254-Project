@@ -18,7 +18,6 @@ public class ObjectMovement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        
         Vector3 temp = new Vector3();
 
 		for (int i = 0; i < m_velocityEffects.Count; i++)
@@ -29,6 +28,18 @@ public class ObjectMovement : MonoBehaviour {
 
         //Debug.Log("Temp: " + temp);
         GetComponent<Rigidbody>().velocity += temp;
+
+        for (int i  = 0; i < m_effectsOrig.Count; i++)
+        {
+            try
+            {
+                Debug.Log("Name: " + gameObject.name + "    Origin Effect " + i + ": " + m_effectsOrig[i]);
+            }
+            catch
+            {
+                Debug.Log("Caught");
+            }
+        }
     }
 
     public void UpdateWells(GameObject obj, Vector3 vec)
@@ -51,21 +62,23 @@ public class ObjectMovement : MonoBehaviour {
         }
     }
 
-    public void RemoveWell(GameObject obj)
+    public void RemoveWell(GameObject gravityWell)
     {
-        int location = CheckWells(obj);
+        int location = CheckWells(gravityWell);
+        //Debug.Log("Index: " + location);
 
         m_effectsOrig.RemoveAt(location);
         m_velocityEffects.RemoveAt(location);
     }
 
-    private int CheckWells(GameObject obj)
+
+    private int CheckWells(GameObject gravityWell)
     {
         int location = 0;
  
         for (int i = 0; i < m_effectsOrig.Count; i++)
         {
-            if (m_effectsOrig[i] == obj)
+            if (m_effectsOrig[i] == gravityWell)
             {
                 //Debug.Log("Found");
                 location = i;
@@ -83,12 +96,17 @@ public class ObjectMovement : MonoBehaviour {
     public void Drop()
     {
         //GetComponent<Rigidbody>().isKinematic = false;
+
+
+        //Stops all velocity on the objected when droped
         GetComponent<Rigidbody>().velocity = Vector3.zero;
     }
 
     public void AjustPos(Transform pos)
     {
         //gameObject.transform.position = pos.transform.position + pos.forward * 3;
+
+        //Transforms the position of the object to infornt of the camera
         gameObject.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 3;
     }
 }

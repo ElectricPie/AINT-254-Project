@@ -4,9 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class RepultionTest : MonoBehaviour {
-    
+
 
     //public
+    public Material repelMat;
+    public Material attractMat;
+
     private bool m_polarity;
 
     [Range(0, 1), SerializeField]
@@ -21,17 +24,11 @@ public class RepultionTest : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        //Sets the radius to be the same as the collider
         m_radius = GetComponent<SphereCollider>().radius * 0.8f;
         //m_objects.Add(null);
-    }
-	
-	// Update is called once per frame
-	void FixedUpdate () {
-        for (int i = 0; i < m_direcToObj.Count; i++)
-        {
-            m_direcToObj[i] = m_objects[i].transform.position - transform.position;
-        }
 
+        //Sets the colour of the well to show its polarity
         if (m_polarity)
         {
             GetComponent<Renderer>().material.color = Color.blue;
@@ -40,6 +37,36 @@ public class RepultionTest : MonoBehaviour {
         {
             GetComponent<Renderer>().material.color = Color.red;
         }
+
+        //Sets the outer sphere of the well to show the well polarity
+        Material temp;
+
+        if (m_polarity)
+        {
+            temp = repelMat;
+        }
+        else
+        {
+            temp = attractMat;
+        }
+
+        transform.GetChild(0).GetComponent<Renderer>().material = temp;
+    }
+	
+	// Update is called once per frame
+	void FixedUpdate () {
+        //Updates all objects that the gravity well has effect over
+        for (int i = 0; i < m_direcToObj.Count; i++)
+        {
+            m_direcToObj[i] = m_objects[i].transform.position - transform.position;
+        }
+    }
+
+    private void Update()
+    {
+        
+
+        //Debug.Log("Index: " + index);
     }
 
     void Repel()
@@ -91,7 +118,7 @@ public class RepultionTest : MonoBehaviour {
     {
         if ((other.tag == "Object" || other.tag == "Player"))
         {
-            Debug.Log("Collied: " + other.name);
+            //Debug.Log("Collied: " + other.name);
             if (m_polarity == true)
             {
                 Repel();
@@ -105,13 +132,15 @@ public class RepultionTest : MonoBehaviour {
 
     private void OnTriggerExit(Collider other)
     {
+        Debug.Log("Object leaving");
+
         if (other.tag == "Object" || other.tag == "Player")
         {
             //Debug.Log("Hit: " + other);
             m_objects[CheckObjList(other.gameObject)].GetComponent<ObjectMovement>().RemoveWell(gameObject);
 
             int index = CheckObjList(other.gameObject);
-            Debug.Log("Index: " + index);
+            //Debug.Log("Index: " + index);
 
             m_direcToObj.RemoveAt(CheckObjList(other.gameObject));
             m_objects.RemoveAt(CheckObjList(other.gameObject));
@@ -137,7 +166,7 @@ public class RepultionTest : MonoBehaviour {
 
     private void OnDisable()
     {
-        Debug.Log("Disable");
+        //Debug.Log("Disable");
         m_objects.Clear();
         m_direcToObj.Clear();
     }
