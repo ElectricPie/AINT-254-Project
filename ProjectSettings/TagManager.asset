@@ -10,6 +10,12 @@ TagManager:
   - Door
   - Dispenser
   - PlyBtn
+  - GravityWell
+  - Goo
+  - GooDrain
+  - GravityWellCore
+  - Button
+  - Gas
   layers:
   - Default
   - TransparentFX

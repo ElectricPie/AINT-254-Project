@@ -6,6 +6,14 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour {
     public GameObject pressIcon;
     public GameObject pickUpIcon;
+    public GameObject eraserIcon;
+
+    public GameOver dead;
+
+    public Transform checkpoint;
+
+    [SerializeField]
+    private float m_health = 5;
 
     [SerializeField]
     private float m_speed = 5.0f;
@@ -24,15 +32,16 @@ public class PlayerController : MonoBehaviour {
     Vector3 temp;
 
     // Use this for initialization
-    void Start () {
+    void Start() {
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
         pressIcon.SetActive(false);
         pickUpIcon.SetActive(false);
+        eraserIcon.SetActive(false);
 
         m_rigidbody = GetComponent<Rigidbody>();
-	}
+    }
 
     // Update is called once per frame
     void Update() {
@@ -50,24 +59,38 @@ public class PlayerController : MonoBehaviour {
         //-Icons
         if (Physics.Raycast(ray, out hit))
         {
-            if (hit.collider.tag == "Object")
+            string tag = hit.collider.tag;
+
+            if (tag == "Object")
             {
                 pickUpIcon.SetActive(true);
             }
-            else if (hit.collider.tag == "PlyBtn")
+            else if (tag == "PlyBtn")
             {
                 pressIcon.SetActive(true);
+            }
+            else if (tag == "GravityWell")
+            {
+                eraserIcon.SetActive(true);
             }
             else
             {
                 pressIcon.SetActive(false);
                 pickUpIcon.SetActive(false);
+                eraserIcon.SetActive(false);
+            }
+
+            //Health
+            if (m_health <= 0)
+            {
+                
             }
         }
 
         //Interacting
-        if (Input.GetButtonDown("Interact"))// && m_interactDelay <= 0)
+        if (Input.GetButtonDown("Interact"))
         {
+            //Checks if already holding an object
             if (m_holdingObj)
             {
                 m_holdingObj = false;
@@ -79,13 +102,11 @@ public class PlayerController : MonoBehaviour {
             {
                 if (Physics.Raycast(ray, out hit))
                 {
-                    //Debug.Log(hit.collider);
                     if (hit.transform.tag == "Object")
                     {
                         try
                         {
                             m_heldObj = hit.collider.gameObject.GetComponent<ObjectMovement>();
-                            m_heldObj.PickUp();
                             m_holdingObj = true;
                         }
                         catch
@@ -98,15 +119,7 @@ public class PlayerController : MonoBehaviour {
                         hit.transform.gameObject.GetComponent<PlyButton>().TriggerBtn();
                     }
                 }
-
-
             }
-        }
-
-        if (m_holdingObj)
-        {
-            m_heldObj.AjustPos(gameObject.transform);
-            pickUpIcon.SetActive(false);
         }
 
         //Jumping
@@ -127,16 +140,35 @@ public class PlayerController : MonoBehaviour {
         {
             if (m_stance)
             {
-                tag = "Player";
+                tag = "Untagged";
 
                 m_stance = !m_stance;
             }
             else
             {
-                tag = "Untagged";
+                tag = "Player";
 
                 m_stance = !m_stance;
             }
+        }
+
+        if (m_holdingObj)
+        {
+            m_heldObj.AjustPos(gameObject.transform);
+            pickUpIcon.SetActive(false);
+        }
+
+        //Escape
+        if (Input.GetButtonDown("Cancel"))
+        {
+            Debug.Log("Quitting");
+            Debug.Break();
+            Application.Quit();
+        }
+
+        if (m_health <= 0)
+        {
+            Death();
         }
     }
 
@@ -148,11 +180,26 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    private void OnTriggerStay(Collider other)
+    {
+
+    }
+
     private void OnCollisionExit(Collision collision)
     {
-        
         m_grounded = false;
-        
+    }
+
+    private void Death()
+    {
+        transform.position = checkpoint.position;
+        m_health = 5;
+    }
+
+    public float Health
+    {
+        get { return m_health;  }
+        set { m_health += value; }
     }
 }
 

@@ -19,14 +19,13 @@ public class WellPreview : MonoBehaviour {
 
         if (gunCont.Polarity)
         {
-            temp = repelMat;
+            temp = attractMat;
         }
         else
         {
-            temp = attractMat;
+            temp = repelMat;
         }
 
         transform.GetChild(0).GetComponent<Renderer>().material = temp;
-
     }
 }

@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class GunController : MonoBehaviour {
 
+    //Public Vairables
     public int wellAmount = 3;
+    public float intialStrength = 0.5f;
 
     public Renderer polarityIndicator;
 
@@ -14,163 +16,246 @@ public class GunController : MonoBehaviour {
 
     public Transform gravityWellHolder;
 
-    private bool m_polarity;
-    private bool m_cleared;
+    //Private Vairables
+    [SerializeField]
+    private bool m_disabled;
+    private bool m_polarity; //true: attraction      false: repultion
 
     private float m_strength;
 
     private int m_power;
     private int m_wellCycle;
 
-    //private List<GameObject> m_gravityWells;
+    private bool[] m_activeWells;
+
     private GameObject[] m_gravityWells;
+
     // Use this for initialization
     void Start () {
-        m_gravityWells = new GameObject[wellAmount];
-        gravityWellPreview = Instantiate(gravityWellPreview);
-        m_cleared = true;
+        m_gravityWells = new GameObject[wellAmount]; //Creates an array to hold gravity wells
+        m_activeWells = new bool[wellAmount];
 
+        gravityWellPreview = Instantiate(gravityWellPreview); //Instatiates and holds the gameobject of the aiming gravity well
+
+        //Instatiates and adds gravity wells to the array
         for (int i = 0; i < m_gravityWells.Length; i++)
         {
             m_gravityWells[i] = Instantiate(gravityWell, gravityWellHolder);
-            m_gravityWells[i].SetActive(false);
+            m_gravityWells[i].name = "GravityWell " + i; //Renames gravity wells for easyer identification
+            m_gravityWells[i].GetComponent<RepultionTest>().Index = i;
+            //m_gravityWells[i].SetActive(false); //Disables gravity wells
+
+            m_activeWells[i] = true;
         }
 
-        m_wellCycle = 0;
-        m_strength = 0.2f;
-        m_power = 1;
+        m_wellCycle = 0; //Sets the cycle for which gravity well is to be moved next
+        m_strength = intialStrength; //Sets the starting strength of gravity wells 
+        m_power = 1; //Sets the starting number used on the UI to show power
+        m_disabled = false;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
         //Controls
-        //-Polarity
-        if (Input.GetButtonDown("Toggle"))
+        //-Gravity Well Previews       
+        if (!m_disabled)
         {
-            //Polarity Indicator
-            if (m_polarity)
+            if (Input.GetButton("Fire1"))
             {
-                polarityIndicator.material.color = Color.red;
-                m_polarity = !m_polarity;
-            }
-            else
-            {
-                polarityIndicator.material.color = Color.blue;
-                m_polarity = !m_polarity;
-            }
-        }
+                m_polarity = false;
 
-
-        //-Power
-        if (Input.GetButtonDown("Increase"))
-        {
-            if (m_strength < 0.9) {
-                m_strength += 0.1f;
-                m_power += 1;
-            }
-
-            UpdateStrengthIndi();
-        }
-
-        if (Input.GetButtonDown("Decrease"))
-        {
-            if (m_strength > 0.2f)
-            {
-                m_strength -= 0.1f;
-                m_power -= 1;
-            }
-
-            UpdateStrengthIndi();
-        }
-
-        
-        //-Landing Preview
-        if (Input.GetButton("Fire"))
-        {
-            Transform cam = Camera.main.transform;
-            Ray ray = new Ray(cam.position, cam.forward * 20);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit))
-            {
-                //Debug.Log(hit.collider);
-                //Debug.Log(hit.collider.tag);
-
-                if (hit.collider.tag == "Wall" || hit.collider.tag == "Ground")
+                if (RaycastTag("Wall") | RaycastTag("Ground") || RaycastTag("Button"))
                 {
                     gravityWellPreview.SetActive(true);
 
-                    gravityWellPreview.transform.position = hit.point;
+                    gravityWellPreview.transform.position = RaycastPoint();
                 }
-
             }
-        }
-        
 
-        //-Fire
-        if (Input.GetButtonUp("Fire"))
-        {
-            gravityWellPreview.SetActive(false);
-
-            Transform cam = Camera.main.transform;
-            Ray ray = new Ray(cam.position, cam.forward * 20);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit))
+            if (Input.GetButton("Fire2"))
             {
-                //Debug.Log(hit.collider);
-                //Debug.Log(hit.collider.tag);
-                
+                m_polarity = true;
 
-                if (hit.collider.tag == "Wall" || hit.collider.tag == "Ground")
+                if (RaycastTag("Wall") || RaycastTag("Ground") || RaycastTag("Button"))
                 {
+                    gravityWellPreview.SetActive(true);
 
-                    m_gravityWells[m_wellCycle].SetActive(true);
-
-                    m_gravityWells[m_wellCycle].GetComponent<RepultionTest>().Polarity(m_polarity);
-                    m_gravityWells[m_wellCycle].GetComponent<RepultionTest>().Strength(m_strength);
-
-                    m_gravityWells[m_wellCycle].transform.position = hit.point;
-
-                    if (m_wellCycle < wellAmount - 1)
-                    {
-                        m_wellCycle++;
-                    }
-                    else
-                    {
-                        m_wellCycle = 0;
-                    }
-
-                    m_cleared = false;
+                    gravityWellPreview.transform.position = RaycastPoint();
                 }
             }
-            
-        }
 
-        //-Clear
-        if (Input.GetButtonDown("Clear") && !m_cleared) {
-            if (m_wellCycle > 1)
+            //-Fire Gravity Well
+            if (Input.GetButtonUp("Fire1"))
             {
-                m_wellCycle--;
-            }
-            else
-            {
-                m_wellCycle = wellAmount - 1;
+                Vector3 impact = RaycastPoint();
+
+                ChooseWell(impact, true);
             }
 
-            m_gravityWells[m_wellCycle].SetActive(false);
-            m_cleared = true;
+            if (Input.GetButtonUp("Fire2"))
+            {
+                Vector3 impact = RaycastPoint();
+
+                ChooseWell(impact, false);
+            }
+
+            //Clearing gravity wells
+            if (Input.GetButtonDown("Clear"))
+            {
+                if (RaycastTag("GravityWell"))
+                {
+                    GameObject temp = RaycastGameobject("GravityWell");
+
+                    if (temp != null)
+                    {
+                        ClearWell(temp);
+                    }
+                }
+            }
         }
     }
 
-    private void UpdateStrengthIndi()
+    private Vector3 RaycastPoint()
     {
-        Animator anim = strengthIndicator.GetComponent<Animator>();
+        //Creates a raycast from the camera to a position infront of the camera
+        Transform cam = Camera.main.transform;
+        Ray ray = new Ray(cam.position, cam.forward * 20);
+        RaycastHit hit;
 
-        anim.SetInteger("power", m_power);
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.collider.tag == "Wall" || hit.collider.tag == "Ground" || hit.collider.tag == "Button") 
+            {
+                return hit.point;
+            }
+        }
+        else
+        {
+            return new Vector3();
+        }
+
+        return new Vector3();
     }
 
+    private GameObject RaycastGameobject(string tag)
+    {
+        //Creates a raycast from the camera to a position infront of the camera
+        Transform cam = Camera.main.transform;
+        Ray ray = new Ray(cam.position, cam.forward * 20);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.collider.tag == tag)
+            {
+                return hit.transform.gameObject;
+            }
+        }
+        else
+        {
+            return null;
+        }
+
+        return null;
+    }
+
+    private bool RaycastTag(string tag)
+    {
+        //Creates a raycast from the camera to a position infront of the camera
+        Transform cam = Camera.main.transform;
+        Ray ray = new Ray(cam.position, cam.forward * 20);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.collider.tag == tag)
+            {
+                return true;
+            }
+        }
+        else
+        {
+            return false;
+        }
+
+        return false;
+    }
+
+    //Ajust the vairables of the next well the the aimed location
+    private void ChooseWell(Vector3 impact, bool polarity)
+    {
+        bool[] activeWells = CheckActiveWells();
+        int inactiveWell = -1;
+
+        for (int i = 0; i < activeWells.Length; i++)
+        {
+            if (activeWells[i] == false)
+            {
+                inactiveWell = i;
+            }
+        }
+
+         
+        if (inactiveWell == -1)
+        {
+            MoveWell(m_wellCycle, impact, polarity);
+
+            //Increments the well cycle so that the a diffrent well is fired
+            if (m_wellCycle < wellAmount - 1) //Increases the well cycle by 1 if its not above the initial well amount
+            {
+                m_wellCycle++;
+            }
+            else //Sets the well cycle to 0 if it goes above 2
+            {
+                m_wellCycle = 0;
+            }
+        }
+        else
+        {
+            MoveWell(inactiveWell, impact, polarity);
+        }
+
+        gravityWellPreview.SetActive(false);
+    }
+
+    private void MoveWell(int wellIndex, Vector3 impact, bool polarity)
+    {
+        RepultionTest adjustingWell = m_gravityWells[wellIndex].GetComponent<RepultionTest>();
+
+        m_gravityWells[wellIndex].SetActive(true); //Activates the well incase it has become deactive
+        m_activeWells[wellIndex] = true;
+
+
+        adjustingWell.Polarity = polarity; //Changes the polarity of the well to the desired type
+        adjustingWell.Strength = m_strength; //Adjusts the strength of the well
+        adjustingWell.UpdateColour();
+
+        m_gravityWells[wellIndex].transform.position = impact; //Moves the well to the inpact location of the raycast
+    }
+
+    private bool[] CheckActiveWells()
+    {
+        bool[] activeWells = new bool[wellAmount];
+
+        for (int i = 0; i < m_gravityWells.Length; i++)
+        {
+            activeWells[i] = m_gravityWells[i].activeSelf;
+        }
+
+        return activeWells;
+    }
+
+
+    public void ClearWell(GameObject temp) //Clears the well
+    {
+        Debug.Log("Clearing Well");
+        int index = temp.GetComponent<RepultionTest>().Index;
+        m_gravityWells[index].SetActive(false);
+    }
+
+
+    //GET SET
     public int Power
     {
         get { return m_power; }
@@ -179,6 +264,11 @@ public class GunController : MonoBehaviour {
     public bool Polarity
     {
         get { return m_polarity; }
+    }
+
+    public bool Disable
+    {
+        set { m_disabled = value; }
     }
 
     public int WellCycle

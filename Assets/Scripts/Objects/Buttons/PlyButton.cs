@@ -22,12 +22,8 @@ public class PlyButton : Button {
 
     public void TriggerBtn()
     {
-        //Debug.Log("Pushed PlyBtn");
-
         if (toggle)
         {
-            Debug.Log("Toggle Mode");
-            Debug.Log(m_toggled);
             if (m_toggled)
             {
                 TriggerOff(target);
@@ -44,32 +40,4 @@ public class PlyButton : Button {
             TriggerOn(target);
         }
     }
-
-    /*
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("Tag: " + other.gameObject.tag);
-
-        if (other.gameObject.tag == "Object" || other.gameObject.tag == "Player")
-        {
-            transform.position += new Vector3(0, -0.05f, 0);
-
-            active = true;
-
-            TriggerOn(target);
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (active)
-        {
-            transform.localPosition = new Vector3(0, 0.3f, 0);
-        }
-
-        TriggerOff(target);
-
-        active = false;
-    }
-    */
 }

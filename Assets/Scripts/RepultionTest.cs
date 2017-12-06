@@ -4,13 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class RepultionTest : MonoBehaviour {
-
-
     //public
     public Material repelMat;
     public Material attractMat;
-
-    private bool m_polarity;
+    [SerializeField]
+    private bool m_polarity; 
+    private int m_index;
 
     [Range(0, 1), SerializeField]
     private float m_strength;
@@ -18,39 +17,18 @@ public class RepultionTest : MonoBehaviour {
     //Private
     private List<Vector3> m_direcToObj = new List<Vector3>();
 
-    private float m_radius;
-
     private List<GameObject> m_objects = new List<GameObject>();
+
+    private GameObject m_repultionParticals;
+    private GameObject m_attractionParticals;
 
 	// Use this for initialization
 	void Start () {
-        //Sets the radius to be the same as the collider
-        m_radius = GetComponent<SphereCollider>().radius * 0.8f;
-        //m_objects.Add(null);
-
-        //Sets the colour of the well to show its polarity
-        if (m_polarity)
-        {
-            GetComponent<Renderer>().material.color = Color.blue;
-        }
-        else
-        {
-            GetComponent<Renderer>().material.color = Color.red;
-        }
-
         //Sets the outer sphere of the well to show the well polarity
-        Material temp;
+        UpdateColour();
 
-        if (m_polarity)
-        {
-            temp = repelMat;
-        }
-        else
-        {
-            temp = attractMat;
-        }
-
-        transform.GetChild(0).GetComponent<Renderer>().material = temp;
+        m_repultionParticals = transform.GetChild(1).gameObject;
+        m_attractionParticals = transform.GetChild(2).gameObject;
     }
 	
 	// Update is called once per frame
@@ -62,17 +40,8 @@ public class RepultionTest : MonoBehaviour {
         }
     }
 
-    private void Update()
-    {
-        
-
-        //Debug.Log("Index: " + index);
-    }
-
     void Repel()
     {
-        //testObj.GetComponent<Rigidbody>().velocity = temp; //Applys the vector to the object
-        //Debug.Log("Velocity: " + temp);
         for (int i = 0; i < m_objects.Count; i++)
         {
             Vector3 temp = new Vector3(m_direcToObj[i].x, m_direcToObj[i].y, m_direcToObj[i].z) * m_strength; //Creates a vector in the direction of the well
@@ -83,8 +52,6 @@ public class RepultionTest : MonoBehaviour {
 
     void Attract()
     {
-        //testObj.GetComponent<Rigidbody>().velocity = temp;
-        //Debug.Log("Velocity: " + temp);
         for (int i = 0; i < m_objects.Count; i++)
         {
             Vector3 temp = new Vector3(-m_direcToObj[i].x, -m_direcToObj[i].y, -m_direcToObj[i].z) * m_strength;
@@ -94,16 +61,47 @@ public class RepultionTest : MonoBehaviour {
         }
     }
 
+    private int CheckObjList(GameObject obj)
+    {
+        int location = -1;
+
+        for (int i = 0; i < m_objects.Count; i++)
+        {
+            if (m_objects[i] == obj)
+            {
+                location = i;
+            }
+        }
+
+        return location;
+    }
+
+    public void UpdateColour()
+    {
+        Material temp;
+
+        if (m_polarity)
+        {
+            temp = repelMat;
+        }
+        else
+        {
+            temp = attractMat;
+        }
+
+        GetComponent<Renderer>().material = temp;
+        transform.GetChild(0).GetComponent<Renderer>().material = temp;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        
+
+        Debug.Log("Well Trigger: " + other.tag);
         if (other.tag == "Object" || other.tag == "Player")
         {
-            //Debug.Log("Other: " + other.name);
-
             if (CheckObjList(other.gameObject) >= 0)
             {
-                Debug.Log("Object already affected");
+                //Debug.Log("Object already affected");
             }
             else
             {
@@ -111,7 +109,7 @@ public class RepultionTest : MonoBehaviour {
                 m_direcToObj.Add(new Vector3());
             }
         }
-        
+
     }
 
     private void OnTriggerStay(Collider other)
@@ -132,52 +130,46 @@ public class RepultionTest : MonoBehaviour {
 
     private void OnTriggerExit(Collider other)
     {
-        Debug.Log("Object leaving");
+        //Debug.Log("Object leaving");
 
         if (other.tag == "Object" || other.tag == "Player")
         {
-            //Debug.Log("Hit: " + other);
             m_objects[CheckObjList(other.gameObject)].GetComponent<ObjectMovement>().RemoveWell(gameObject);
 
             int index = CheckObjList(other.gameObject);
-            //Debug.Log("Index: " + index);
 
-            m_direcToObj.RemoveAt(CheckObjList(other.gameObject));
-            m_objects.RemoveAt(CheckObjList(other.gameObject));
+            m_direcToObj.RemoveAt(index);
+            m_objects.RemoveAt(index);
         }
     }
 
-    private int CheckObjList(GameObject obj)
+    //GET SET
+    public bool Polarity
     {
-        //Debug.Log("Gameobject: " + obj);
-
-        int location = -1;
-
-        for (int i = 0; i < m_objects.Count; i++)
+        set
         {
-            if (m_objects[i] == obj)
+            m_polarity = value;
+            if (m_polarity)
             {
-                location = i;
+                m_repultionParticals.SetActive(true);
+                m_attractionParticals.SetActive(false);
+            }
+            else
+            {
+                m_repultionParticals.SetActive(false);
+                m_attractionParticals.SetActive(true);
             }
         }
-
-        return location;
     }
 
-    private void OnDisable()
+    public float Strength
     {
-        //Debug.Log("Disable");
-        m_objects.Clear();
-        m_direcToObj.Clear();
+        set { m_strength = value; }
     }
 
-    public void Polarity(bool polarity)
+    public int Index
     {
-        m_polarity = polarity;
-    }
-
-    public void Strength(float strength)
-    {
-        m_strength = strength;
+        get { return m_index; }
+        set { m_index = value; }
     }
 }
