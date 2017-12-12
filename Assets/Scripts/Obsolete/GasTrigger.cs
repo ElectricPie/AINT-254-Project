@@ -21,7 +21,7 @@ public class GasTrigger : MonoBehaviour {
 
     private void OnParticleTrigger()
     {
-        Debug.Log("Partical");
+        //Debug.Log("Partical");
     }
 
     private void OnParticleCollision(GameObject other)

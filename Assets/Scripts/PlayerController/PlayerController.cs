@@ -3,15 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour
+{
+    //Public
     public GameObject pressIcon;
     public GameObject pickUpIcon;
     public GameObject eraserIcon;
+
+    public GameMenuUI menuUI;
 
     public GameOver dead;
 
     public Transform checkpoint;
 
+    public WellIndicatorUI indicatorUI;
+
+    //Private
     [SerializeField]
     private float m_health = 5;
 
@@ -27,12 +34,15 @@ public class PlayerController : MonoBehaviour {
     private bool m_holdingObj = false;
     private bool m_stance = false;
 
+    private bool m_paused;
+
     private ObjectMovement m_heldObj;
 
     Vector3 temp;
 
     // Use this for initialization
-    void Start() {
+    void Start()
+    {
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
@@ -41,134 +51,146 @@ public class PlayerController : MonoBehaviour {
         eraserIcon.SetActive(false);
 
         m_rigidbody = GetComponent<Rigidbody>();
+
+
     }
 
     // Update is called once per frame
-    void Update() {
-        float xInput = Input.GetAxis("Horizontal") * Time.deltaTime * m_speed;
-        float zInput = Input.GetAxis("Vertical") * Time.deltaTime * m_speed;
-        float xMouseInput = Input.GetAxis("Mouse X");
-
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
-
-        Transform cam = Camera.main.transform;
-        Ray ray = new Ray(cam.position, cam.forward);
-        RaycastHit hit;
-
-        //-Icons
-        if (Physics.Raycast(ray, out hit))
+    void Update()
+    { 
+        if (!m_paused)
         {
-            string tag = hit.collider.tag;
+            //Movement Inputs
+            float xInput = Input.GetAxis("Horizontal") * Time.deltaTime * m_speed;
+            float zInput = Input.GetAxis("Vertical") * Time.deltaTime * m_speed;
 
-            if (tag == "Object")
-            {
-                pickUpIcon.SetActive(true);
-            }
-            else if (tag == "PlyBtn")
-            {
-                pressIcon.SetActive(true);
-            }
-            else if (tag == "GravityWell")
-            {
-                eraserIcon.SetActive(true);
-            }
-            else
-            {
-                pressIcon.SetActive(false);
-                pickUpIcon.SetActive(false);
-                eraserIcon.SetActive(false);
-            }
+            //Camera Inputs
+            float xMouseInput = Input.GetAxis("Mouse X");
+            float yInput = -Input.GetAxis("Mouse Y");
 
-            //Health
-            if (m_health <= 0)
-            {
-                
-            }
-        }
+            int wellIndex = -1;
 
-        //Interacting
-        if (Input.GetButtonDown("Interact"))
-        {
-            //Checks if already holding an object
-            if (m_holdingObj)
-            {
-                m_holdingObj = false;
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
 
-                m_heldObj.Drop();
-                m_heldObj = null;
-            }
-            else
+            Transform cam = Camera.main.transform;
+            Ray ray = new Ray(cam.position, cam.forward);
+            RaycastHit hit;
+
+            //-Icons/UI
+            if (Physics.Raycast(ray, out hit))
             {
-                if (Physics.Raycast(ray, out hit))
+                string tag = hit.collider.tag;
+
+                if (tag == "Object")
                 {
-                    if (hit.transform.tag == "Object")
+                    pickUpIcon.SetActive(true);
+                }
+                else if (tag == "PlyBtn")
+                {
+                    pressIcon.SetActive(true);
+                }
+                else if (tag == "GravityWell")
+                {
+                    eraserIcon.SetActive(true);
+                    wellIndex = hit.collider.GetComponent<GravityWell>().WellIndex;
+                }
+                else
+                {
+                    pressIcon.SetActive(false);
+                    pickUpIcon.SetActive(false);
+                    eraserIcon.SetActive(false);
+                }
+
+                //Health
+                if (m_health <= 0)
+                {
+
+                }
+
+                indicatorUI.UpdateLook(wellIndex);
+            }
+
+            //Interacting
+            if (Input.GetButtonDown("Interact"))
+            {
+                //Checks if already holding an object
+                if (m_holdingObj)
+                {
+                    m_holdingObj = false;
+
+                    m_heldObj.Drop();
+                    m_heldObj = null;
+                }
+                else
+                {
+                    if (Physics.Raycast(ray, out hit))
                     {
-                        try
+                        if (hit.transform.tag == "Object")
                         {
-                            m_heldObj = hit.collider.gameObject.GetComponent<ObjectMovement>();
-                            m_holdingObj = true;
+                            try
+                            {
+                                m_heldObj = hit.collider.gameObject.GetComponent<ObjectMovement>();
+                                m_holdingObj = true;
+                            }
+                            catch
+                            {
+                                m_holdingObj = false;
+                            }
                         }
-                        catch
+                        else if (hit.transform.tag == "PlyBtn")
                         {
-                            m_holdingObj = false;
+                            hit.transform.gameObject.GetComponent<PlyButton>().TriggerBtn();
                         }
-                    }
-                    else if (hit.transform.tag == "PlyBtn")
-                    {
-                        hit.transform.gameObject.GetComponent<PlyButton>().TriggerBtn();
                     }
                 }
             }
-        }
 
-        //Jumping
-        if (Input.GetButtonDown("Jump") && m_grounded == true)
-        {
-            Vector3 temp = new Vector3();
-            temp.y += m_jump;
-            m_grounded = false;
-
-            m_rigidbody.velocity += temp;
-        }
-
-        transform.Translate(xInput, 0, zInput);
-        transform.Rotate(0, xMouseInput, 0);
-
-        //Change Stance
-        if (Input.GetButtonDown("Stance"))
-        {
-            if (m_stance)
+            //Jumping
+            if (Input.GetButtonDown("Jump") && m_grounded == true)
             {
-                tag = "Untagged";
+                Vector3 temp = new Vector3();
+                temp.y += m_jump;
+                m_grounded = false;
 
-                m_stance = !m_stance;
+                m_rigidbody.velocity += temp;
             }
-            else
+
+
+            //Change Stance
+            if (Input.GetButtonDown("Stance"))
             {
-                tag = "Player";
+                if (m_stance)
+                {
+                    tag = "Untagged";
 
-                m_stance = !m_stance;
+                    m_stance = !m_stance;
+                }
+                else
+                {
+                    tag = "Player";
+
+                    m_stance = !m_stance;
+                }
             }
-        }
 
-        if (m_holdingObj)
-        {
-            m_heldObj.AjustPos(gameObject.transform);
-            pickUpIcon.SetActive(false);
-        }
 
-        //Escape
-        if (Input.GetButtonDown("Cancel"))
-        {
-            Debug.Log("Quitting");
-            Debug.Break();
-            Application.Quit();
-        }
+            if (m_holdingObj)
+            {
+                m_heldObj.AjustPos(gameObject.transform);
+                pickUpIcon.SetActive(false);
+            }
 
-        if (m_health <= 0)
-        {
-            Death();
+
+            if (m_health <= 0)
+            {
+                Death();
+            }
+
+            transform.Translate(xInput, 0, zInput); //Moves the player in a a direction
+
+            transform.Rotate(0, xMouseInput, 0); //Rotates the player horizontaly based om input
+            transform.GetChild(0).Rotate(yInput, 0, 0); //Rotates the camera verticaly based on input
         }
     }
 
@@ -198,8 +220,12 @@ public class PlayerController : MonoBehaviour {
 
     public float Health
     {
-        get { return m_health;  }
+        get { return m_health; }
         set { m_health += value; }
     }
-}
 
+    public bool Paused
+    {
+        set { m_paused = value; }
+    }
+}
