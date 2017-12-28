@@ -51,8 +51,6 @@ public class PlayerController : MonoBehaviour
         eraserIcon.SetActive(false);
 
         m_rigidbody = GetComponent<Rigidbody>();
-
-
     }
 
     // Update is called once per frame
@@ -156,7 +154,6 @@ public class PlayerController : MonoBehaviour
                 m_rigidbody.velocity += temp;
             }
 
-
             //Change Stance
             if (Input.GetButtonDown("Stance"))
             {
@@ -177,6 +174,7 @@ public class PlayerController : MonoBehaviour
 
             if (m_holdingObj)
             {
+                Debug.Log("obj name: " + m_heldObj.name);
                 m_heldObj.AjustPos(gameObject.transform);
                 pickUpIcon.SetActive(false);
             }
@@ -200,11 +198,6 @@ public class PlayerController : MonoBehaviour
         {
             m_grounded = true;
         }
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-
     }
 
     private void OnCollisionExit(Collision collision)

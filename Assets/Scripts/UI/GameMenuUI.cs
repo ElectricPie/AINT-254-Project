@@ -15,6 +15,7 @@ public class GameMenuUI : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        Time.timeScale = 1;
         m_pauseState = false;
 
         m_buttons = new GameObject[2];
@@ -41,11 +42,18 @@ public class GameMenuUI : MonoBehaviour
         if (state)
         {
             Time.timeScale = 1;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
         else
         {
             Time.timeScale = 0;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
+
+        
+        
 
         m_pauseState = !m_pauseState;
         ToggleButtons(m_pauseState);

@@ -4,20 +4,22 @@ using UnityEngine;
 
 public class ObjButton : Button
 {
+    //Public
     public GameObject target;
 
     //private Button btnController;
 
-    private bool active;
+    //Private
+    private GameObject m_button;
+    private bool m_active;
+    private float m_buttonOrigin;
 
 	// Use this for initialization
 	void Start () {
         //btnController = GameObject.Find("BtnController").GetComponent<Button>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+        m_button = transform.GetChild(1).gameObject;
+        m_buttonOrigin = m_button.transform.localPosition.y;
+        Debug.Log("Pos: " + m_buttonOrigin);
 	}
 
     private void OnTriggerEnter(Collider other)
@@ -26,9 +28,9 @@ public class ObjButton : Button
 
         if (other.gameObject.tag == "Object" || other.gameObject.tag == "Player")
         {
-            transform.position += new Vector3(0, -0.05f, 0);
-                
-            active = true;
+            m_button.transform.localPosition = new Vector3(0, m_buttonOrigin -0.01f, 0);
+
+            m_active = true;
 
             TriggerOn(target);
         }
@@ -36,14 +38,14 @@ public class ObjButton : Button
 
     private void OnTriggerExit(Collider other)
     {
-        if (active)
+        if (m_active)
         {
-            transform.localPosition = new Vector3(0, 0.3f, 0);
+            m_button.transform.localPosition = new Vector3(0, m_buttonOrigin, 0);
         }
 
         TriggerOff(target);
 
-        active = false;
+        m_active = false;
     }
 
 }

@@ -49,8 +49,6 @@ public class WellIndicatorUI : MonoBehaviour {
 
     public void UpdateLook(int index)
     {
-        Debug.Log("Index: " + index);
-
         for (int i = 0; i < m_borderIndicator.Length; i++)
         {
             m_borderIndicator[i].sprite = indicatorBorderSprites[0];

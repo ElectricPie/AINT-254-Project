@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Dispenser : MonoBehaviour {
+    //Public
     public GameObject dispensePrefab;
     public GameObject cubeSpwan;
 
+    //Private
     private GameObject m_dispensedItem;
 
     private void Start()
