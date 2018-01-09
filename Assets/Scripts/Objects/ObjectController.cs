@@ -52,10 +52,7 @@ public class ObjectController : MonoBehaviour
 
     public GameObject NewObject
     {
-        set {
-            //Debug.Log("obj " + gameObject.name);
-            //Debug.Log("List Count: " + m_objects.Count);
-            m_objects.Add(value); } //Adds a new object to the list
+        set { m_objects.Add(value); } //Adds a new object to the list
     }
 
     public GameObject NewWell

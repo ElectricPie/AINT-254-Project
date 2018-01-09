@@ -293,8 +293,8 @@ public class GunController : MonoBehaviour {
 
     public void ClearWell(GameObject temp) //Clears the well
     {
-        Debug.Log("Clearing Well");
-        m_gravityWells[temp.GetComponent<GravityWell>().WellIndex].SetActive(false);
+        m_gravityWells[temp.GetComponent<GravityWell>().WellIndex].GetComponent<GravityWell>().Clear(); //Stops the well from emmiting it affect on objects
+        m_gravityWells[temp.GetComponent<GravityWell>().WellIndex].SetActive(false); //Disables the object so its not visable
     }
 
 

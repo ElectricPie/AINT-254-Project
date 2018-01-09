@@ -25,17 +25,15 @@ public class GravityWell : MonoBehaviour {
     public void AffectObject(GameObject obj)
     {
         Vector3 directObj = gameObject.transform.position - obj.transform.position;
-        //Debug.Log("Direction: " + directObj);
-        //Debug.Log("Strenght: " + m_objCont.GetWellStrength);
 
         Vector3 objVel = obj.GetComponent<Rigidbody>().velocity; //Gets the objects current velocity
 
         Vector3 newVel = objVel; //Create a new temp vector3 to store the new calculated velocity of the object
 
+        //Limits object velocity from going too high
         if (newVel.x < 2 || newVel.x > -2) //Limits the objects velocity in the x axis
         {
-            newVel.x += directObj.x * m_objCont.GetWellStrength * m_polarity; //gets the direction of the cube from the gravity well and 
-                                                                              //multiplys it by the wells strenght and the polarity
+            newVel.x += directObj.x * m_objCont.GetWellStrength * m_polarity; //gets the direction of the cube from the gravity well and                                                             //multiplys it by the wells strenght and the polarity
         }
 
         if (newVel.y < 2 || newVel.y > -2) //Limits the objects velocity in the y axis
@@ -50,7 +48,6 @@ public class GravityWell : MonoBehaviour {
                                                                               //multiplys it by the wells strenght and the polarity
         }
 
-        //Debug.Log("New Velocity: " + newVel);
         obj.GetComponent<Rigidbody>().velocity = newVel; //Applys the new velocity to the object
     }
 
@@ -89,6 +86,11 @@ public class GravityWell : MonoBehaviour {
                 return true;
             }
         }
+    }
+
+    public void Clear()
+    {
+        m_polarity = 0;
     }
 
     public int WellIndex

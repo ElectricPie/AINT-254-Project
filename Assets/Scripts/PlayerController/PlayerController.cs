@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     public GameObject pressIcon;
     public GameObject pickUpIcon;
     public GameObject eraserIcon;
+    public GameObject objectAim;
 
     public GameMenuUI menuUI;
 
@@ -55,7 +56,7 @@ public class PlayerController : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    { 
+    {
         if (!m_paused)
         {
             //Movement Inputs
@@ -75,39 +76,53 @@ public class PlayerController : MonoBehaviour
             Ray ray = new Ray(cam.position, cam.forward);
             RaycastHit hit;
 
-            //-Icons/UI
+            RaycastHit[] hits;
+            hits = Physics.RaycastAll(cam.position, cam.forward, 4.0F);
+
+            bool[] icons = new bool[3];
+            for (int i = 0; i < icons.Length; i++)
+            {
+                icons[i] = false;
+            }
+
+
             if (Physics.Raycast(ray, out hit))
             {
-                string tag = hit.collider.tag;
+                for (int i = 0; i < hits.Length; i++)
+                {
+                    string tag = hits[i].transform.tag;
 
-                if (tag == "Object")
-                {
-                    pickUpIcon.SetActive(true);
-                }
-                else if (tag == "PlyBtn")
-                {
-                    pressIcon.SetActive(true);
-                }
-                else if (tag == "GravityWell")
-                {
-                    eraserIcon.SetActive(true);
-                    wellIndex = hit.collider.GetComponent<GravityWell>().WellIndex;
-                }
-                else
-                {
-                    pressIcon.SetActive(false);
-                    pickUpIcon.SetActive(false);
-                    eraserIcon.SetActive(false);
-                }
+                    if (tag == "Object")
+                    {
+                        pickUpIcon.SetActive(true); //Enables pick up icon
+                        icons[0] = true;
+                    }
+                    else if (tag == "PlyBtn")
+                    {
+                        pressIcon.SetActive(true);//Enables interaction icon
+                        icons[1] = true;
+                    }
+                    else if (tag == "GravityWell")
+                    {
+                        eraserIcon.SetActive(true); //Enables clear well icon
+                        icons[2] = true;
+                        wellIndex = hits[i].collider.GetComponent<GravityWell>().WellIndex;
+                    }
 
-                //Health
-                if (m_health <= 0)
-                {
-
+                    Debug.Log("Is all false: " + CheckAllFalse(icons));                   
                 }
-
-                indicatorUI.UpdateLook(wellIndex);
             }
+
+            //Clears all icons if player is not looking at anything that can be interacted with
+            if (CheckAllFalse(icons))
+            {
+                //Hides all icons
+                pressIcon.SetActive(false);
+                pickUpIcon.SetActive(false);
+                eraserIcon.SetActive(false);
+            }
+
+
 
             //Interacting
             if (Input.GetButtonDown("Interact"))
@@ -115,30 +130,54 @@ public class PlayerController : MonoBehaviour
                 //Checks if already holding an object
                 if (m_holdingObj)
                 {
+                    int dropMod = 40;
+
                     m_holdingObj = false;
 
-                    m_heldObj.Drop();
+                    float dir = transform.rotation.eulerAngles.y;
+                    Vector3 dropVel;                 
+
+                    if (dir >= 315 || dir < 45)
+                    {
+                        Debug.Log("Forward");
+                        dropVel = new Vector3(xInput * dropMod, m_rigidbody.velocity.y, zInput * dropMod);
+                    }
+                    else if (dir >= 45 && dir < 135)
+                    {
+                        Debug.Log("Right");
+                        dropVel = new Vector3(zInput * dropMod, m_rigidbody.velocity.y, xInput  * dropMod);
+                    }
+                    else if (dir >= 135  && dir < 225)
+                    {
+                        Debug.Log("Back");
+                        dropVel = new Vector3(-xInput * dropMod, m_rigidbody.velocity.y, -zInput * dropMod);
+                    }
+                    else  if (dir  >= 255 && dir < 315)
+                    {
+                        Debug.Log("Left");
+                        dropVel = new Vector3(-zInput * dropMod, m_rigidbody.velocity.y, xInput * dropMod);
+                    }
+                    else
+                    {
+                        dropVel = new Vector3();
+                    }
+
+                    m_heldObj.Drop(dropVel);
                     m_heldObj = null;
                 }
                 else
                 {
-                    if (Physics.Raycast(ray, out hit))
+                    for (int i = 0; i < hits.Length; i++)
                     {
-                        if (hit.transform.tag == "Object")
+                        if (hits[i].transform.tag == "Object")
                         {
-                            try
-                            {
-                                m_heldObj = hit.collider.gameObject.GetComponent<ObjectMovement>();
-                                m_holdingObj = true;
-                            }
-                            catch
-                            {
-                                m_holdingObj = false;
-                            }
+                            m_heldObj = hits[i].collider.gameObject.GetComponent<ObjectMovement>();
+                            m_heldObj.PickUp(objectAim);
+                            m_holdingObj = true;
                         }
-                        else if (hit.transform.tag == "PlyBtn")
+                        else if (hits[i].transform.tag == "PlyBtn")
                         {
-                            hit.transform.gameObject.GetComponent<PlyButton>().TriggerBtn();
+                            hits[i].transform.gameObject.GetComponent<PlyButton>().TriggerBtn();
                         }
                     }
                 }
@@ -174,8 +213,7 @@ public class PlayerController : MonoBehaviour
 
             if (m_holdingObj)
             {
-                Debug.Log("obj name: " + m_heldObj.name);
-                m_heldObj.AjustPos(gameObject.transform);
+                //m_heldObj.AjustPos(gameObject.transform);
                 pickUpIcon.SetActive(false);
             }
 
@@ -192,6 +230,20 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private bool CheckAllFalse(bool[] array)
+    {
+        for (int i = 0; i < array.Length; i ++)
+        {
+            if (array[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    //Collision
     private void OnCollisionStay(Collision collision)
     {
         if (collision.gameObject.tag == "Ground")

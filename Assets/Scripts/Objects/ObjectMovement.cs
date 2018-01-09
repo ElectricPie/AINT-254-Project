@@ -6,31 +6,30 @@ using UnityEngine;
 public class ObjectMovement : MonoBehaviour {
     public bool interactable = false;
 
-    
-
     //Movement
     private List<GameObject> m_effectsOrig = new List<GameObject>();
     private List<Vector3> m_velocityEffects = new List<Vector3>();
 
+    private GameObject m_aim;
+
+    private bool m_pickedUp;
     
 
     // Use this for initialization
     void Start () {
         m_effectsOrig.Add(null);
         m_velocityEffects.Add(new Vector3());
+        m_pickedUp = false;
     }
 	
 	// Update is called once per frame
 	void Update () {
-        Vector3 temp = new Vector3();
-
-		for (int i = 0; i < m_velocityEffects.Count; i++)
+        if (m_pickedUp == true)
         {
-            temp += m_velocityEffects[i];
-        }
+            Vector3 directTar = transform.localPosition - m_aim.transform.position;
 
-        //Applys velocity to the object
-        GetComponent<Rigidbody>().velocity += temp;
+            GetComponent<Rigidbody>().velocity = -directTar * 20;
+        }
     }
 
     public void UpdateWells(GameObject obj, Vector3 vec)
@@ -72,11 +71,18 @@ public class ObjectMovement : MonoBehaviour {
 
         return location;
     }
+    public void PickUp(GameObject aim)
+    {
+        m_aim = aim;
+        m_pickedUp = true;
+    }
 
-    public void Drop()
+    public void Drop(Vector3 velocity)
     {
         //Stops all velocity on the objected when droped
-        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Rigidbody>().velocity = velocity;
+        m_aim = null;
+        m_pickedUp = false;
     }
 
     public void AjustPos(Transform pos)

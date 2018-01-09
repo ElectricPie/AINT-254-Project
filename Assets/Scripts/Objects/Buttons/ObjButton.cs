@@ -19,7 +19,6 @@ public class ObjButton : Button
         //btnController = GameObject.Find("BtnController").GetComponent<Button>();
         m_button = transform.GetChild(1).gameObject;
         m_buttonOrigin = m_button.transform.localPosition.y;
-        Debug.Log("Pos: " + m_buttonOrigin);
 	}
 
     private void OnTriggerEnter(Collider other)
