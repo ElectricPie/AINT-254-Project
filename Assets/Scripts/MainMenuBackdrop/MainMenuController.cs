@@ -36,7 +36,6 @@ public class MainMenuController : MonoBehaviour
         if (m_startTimer < 0) //Stops the hatches immediately opening
             if (cubeTest.transform.position.y > -1)
             {
-                Debug.Log("Above");
                 if (cubSum == 0f)
                 {
                     m_openHatch = true;
@@ -45,7 +44,7 @@ public class MainMenuController : MonoBehaviour
             else
             {
                 Debug.Log("Below Threshold");
-                m_openHatch = false;
+                m_openHatch = false; 
             }
         else
         {

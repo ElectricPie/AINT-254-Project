@@ -38,12 +38,12 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 11
-  m_GIWorkflowMode: 1
+  m_GIWorkflowMode: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -486,6 +486,11 @@ Prefab:
     - target: {fileID: 1406108055356898, guid: 426524cd55f87f344952ba5edf8a77bd, type: 2}
       propertyPath: m_Name
       value: Level (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 114104288570429986, guid: 426524cd55f87f344952ba5edf8a77bd,
+        type: 2}
+      propertyPath: m_Interactable
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 426524cd55f87f344952ba5edf8a77bd, type: 2}
@@ -1493,7 +1498,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 20}
-  m_SizeDelta: {x: -34, y: -228.67}
+  m_SizeDelta: {x: -34, y: -272.58}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &971083016
 MonoBehaviour:
@@ -1890,7 +1895,12 @@ Prefab:
     - target: {fileID: 114104288570429986, guid: 426524cd55f87f344952ba5edf8a77bd,
         type: 2}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
-      value: Level1Tut
+      value: Test
+      objectReference: {fileID: 0}
+    - target: {fileID: 114104288570429986, guid: 426524cd55f87f344952ba5edf8a77bd,
+        type: 2}
+      propertyPath: m_Interactable
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 426524cd55f87f344952ba5edf8a77bd, type: 2}
@@ -1964,7 +1974,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: -60}
-  m_SizeDelta: {x: -34, y: -229.75}
+  m_SizeDelta: {x: -34, y: -273.23}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1079426753
 MonoBehaviour:
@@ -2451,7 +2461,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -1045.7, y: -417.5}
+  m_SizeDelta: {x: -609.2, y: -282.36}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1347292442
 MonoBehaviour:
@@ -2831,6 +2841,11 @@ Prefab:
       propertyPath: m_Name
       value: Level (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 114104288570429986, guid: 426524cd55f87f344952ba5edf8a77bd,
+        type: 2}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 426524cd55f87f344952ba5edf8a77bd, type: 2}
   m_IsPrefabParent: 0
@@ -2869,7 +2884,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 60}
-  m_SizeDelta: {x: -34, y: -231.03}
+  m_SizeDelta: {x: -34, y: -273.37}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1597653123
 MonoBehaviour:
@@ -2980,7 +2995,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: -20}
-  m_SizeDelta: {x: -34, y: -230.64}
+  m_SizeDelta: {x: -34, y: -270}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1626873589
 MonoBehaviour:

@@ -1,58 +1,82 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ObjectPrediction : MonoBehaviour {
 
     public GameObject projectionPrefab;
-    public int steps;
-    public float gravity = 9.8f;
 
-    private GameObject[] m_projections;
-    private Vector3 m_cubePos;
-    private Rigidbody m_rigidbody;
+    private bool m_projecting;
+    private GameObject m_projection;
+    private ObjectController m_objCont;
+    private Vector3 m_lastPos;
+    private bool isMoving;
 
     private void Start()
     {
-        /*
-        m_projections = new GameObject[steps];
+        m_objCont = GameObject.Find("ObjectController").GetComponent<ObjectController>();
 
-        for (int i = 0; i < m_projections.Length; i++)
-        {
-            GameObject newObj = Instantiate(projectionPrefab);
-            newObj.SetActive(false);
-            m_projections[i] = newObj;
-        }
-        */
+        m_projecting = false;
+        isMoving = true;
     }
 
-    private void Projection(Vector3 dir)
+    private void Update()
     {
-        float force = 1f;
+        CheckIfMoving();
+    }
 
-        float Vx = dir.x * force;
-        float Vy = dir.y * force;
-        float Vz = dir.z * force;
-
-        for (int i = 0; i < m_projections.Length; i++)
+    public void Projection()
+    {
+        if (!isMoving && !m_projecting && GetComponent<ObjectMovement>().isHeld)
         {
-            float t = i * 0.1f;
-            m_projections[i].transform.position = new Vector3(transform.position.x + Vx * t, 
-                                                             (transform.position.y + Vy * t) - (gravity * t * t / 2.0f), 
-                                                             transform.position.z + Vz * t);
-            m_projections[i].SetActive(true);
+            m_projecting = true;
+
+            //Creates a projections cube
+            m_projection = Instantiate(projectionPrefab);
+
+            //Prevents projected cube from colliding with atual cube
+            Physics.IgnoreCollision(GetComponent<Collider>(), m_projection.GetComponent<Collider>());
+
+            //Puts projected cube in cubes position
+            m_projection.transform.position = transform.position;
+            m_projection.transform.rotation = transform.rotation;
+
+        }
+        else if (isMoving && m_projecting)
+        {
+            RemoveProjection();
+        }
+        else if (!GetComponent<ObjectMovement>().isHeld)
+        {
+                RemoveProjection();
         }
     }
 
-    private void OnTriggerStay(Collider other)
+    private void CheckIfMoving()
     {
-        /*
-        if (other.tag == "GravityWell")
+        Vector3 curPos = transform.position;
+        
+        if (curPos == m_lastPos)
         {
-            Vector3 dirFromWell = (other.gameObject.transform.position - transform.position).normalized;
-
-            Projection(dirFromWell);
+            isMoving = false;
         }
-        */
+        else
+        {
+            isMoving = true;
+        }
+        m_lastPos = curPos;
+    }
+
+    public void RemoveProjection()
+    {
+        m_objCont.RemoveObject(m_projection);
+        Destroy(m_projection);
+        m_projecting = false;
+    }
+
+    public bool Projecting
+    {
+        get { return m_projecting; }
     }
 }

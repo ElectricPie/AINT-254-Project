@@ -43,12 +43,15 @@ public class ObjectController : MonoBehaviour
                 if (dist < 3)
                 {
                     m_gravityWells[i].GetComponent<GravityWell>().AffectObject(m_objects[j]); //Tells the gravity well to affect an object
-                }
-                
+                }   
             }
         }
     }
 
+    public void RemoveObject(GameObject obj)
+    {
+        m_objects.Remove(obj);
+    }
 
     public GameObject NewObject
     {

@@ -90,4 +90,9 @@ public class ObjectMovement : MonoBehaviour {
         //Transforms the position of the object to infornt of the camera
         gameObject.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 3;
     }
+
+    public bool isHeld
+    {
+        get { return m_pickedUp; }
+    }
 }

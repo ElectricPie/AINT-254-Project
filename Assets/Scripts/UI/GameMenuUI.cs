@@ -12,9 +12,14 @@ public class GameMenuUI : MonoBehaviour
     private PlayerController m_player;
     private GunController m_gun;
 
+    private Game m_progression;
+    
+
     // Use this for initialization
     void Start()
     {
+        m_progression = GameObject.Find("Progression").GetComponent<Game>();
+
         Time.timeScale = 1;
         m_pauseState = false;
 
@@ -52,9 +57,6 @@ public class GameMenuUI : MonoBehaviour
             Cursor.visible = true;
         }
 
-        
-        
-
         m_pauseState = !m_pauseState;
         ToggleButtons(m_pauseState);
         m_player.Paused = m_pauseState;
@@ -76,6 +78,7 @@ public class GameMenuUI : MonoBehaviour
     {
         Debug.Log("Quitting");
         Debug.Break();
+        new SaveLoad().Save(m_progression.Progression);
         Application.Quit();
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,7 +14,6 @@ public class GravityWell : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-
         m_objCont = GameObject.Find("ObjectController").GetComponent<ObjectController>();
 
         m_objCont.NewWell = gameObject; //Adds the well to the list
@@ -28,27 +28,40 @@ public class GravityWell : MonoBehaviour {
 
         Vector3 objVel = obj.GetComponent<Rigidbody>().velocity; //Gets the objects current velocity
 
-        Vector3 newVel = objVel; //Create a new temp vector3 to store the new calculated velocity of the object
-
-        //Limits object velocity from going too high
-        if (newVel.x < 2 || newVel.x > -2) //Limits the objects velocity in the x axis
+        try
         {
-            newVel.x += directObj.x * m_objCont.GetWellStrength * m_polarity; //gets the direction of the cube from the gravity well and                                                             //multiplys it by the wells strenght and the polarity
+            obj.GetComponent<ObjectPrediction>().Projection();
+        }
+        catch (NullReferenceException e)
+        {
+            Debug.Log(e);
         }
 
-        if (newVel.y < 2 || newVel.y > -2) //Limits the objects velocity in the y axis
+        if (!obj.GetComponent<ObjectMovement>().isHeld)
         {
-            newVel.y += directObj.y * m_objCont.GetWellStrength * m_polarity; //gets the direction of the cube from the gravity well and 
-                                                                              //multiplys it by the wells strenght and the polarity
-        }
+            Vector3 newVel = objVel; //Create a new temp vector3 to store the new calculated velocity of the object
 
-        if (newVel.z < 2 || newVel.y > -2) //Limits the objects velocity in the z axis
-        {
-            newVel.z += directObj.z * m_objCont.GetWellStrength * m_polarity; //gets the direction of the cube from the gravity well and 
-                                                                              //multiplys it by the wells strenght and the polarity
-        }
 
-        obj.GetComponent<Rigidbody>().velocity = newVel; //Applys the new velocity to the object
+            //Limits object velocity from going too high
+            if (newVel.x < 2 || newVel.x > -2) //Limits the objects velocity in the x axis
+            {
+                newVel.x += directObj.x * m_objCont.GetWellStrength * m_polarity; //gets the direction of the cube from the gravity well and                                                             //multiplys it by the wells strenght and the polarity
+            }
+
+            if (newVel.y < 2 || newVel.y > -2) //Limits the objects velocity in the y axis
+            {
+                newVel.y += directObj.y * m_objCont.GetWellStrength * m_polarity; //gets the direction of the cube from the gravity well and 
+                                                                                  //multiplys it by the wells strenght and the polarity
+            }
+
+            if (newVel.z < 2 || newVel.y > -2) //Limits the objects velocity in the z axis
+            {
+                newVel.z += directObj.z * m_objCont.GetWellStrength * m_polarity; //gets the direction of the cube from the gravity well and 
+                                                                                  //multiplys it by the wells strenght and the polarity
+            }
+
+            obj.GetComponent<Rigidbody>().velocity = newVel; //Applys the new velocity to the object
+        }
     }
 
     //Toggles the state of the gravity wells partical effects

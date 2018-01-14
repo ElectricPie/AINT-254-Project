@@ -108,8 +108,6 @@ public class PlayerController : MonoBehaviour
                         icons[2] = true;
                         wellIndex = hits[i].collider.GetComponent<GravityWell>().WellIndex;
                     }
-
-                    Debug.Log("Is all false: " + CheckAllFalse(icons));                   
                 }
             }
 
